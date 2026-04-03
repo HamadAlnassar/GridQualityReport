@@ -159,7 +159,7 @@ double compute_dc_offset(WaveformSample* samples, int n, int phase_choice) {
         for (int i = 0; i < n; i++) {
             double v = (samples + i)->phase_A_voltage;
             // Filter out positive clipping to match assignment requirements
-            if (v < CLIPPING_LIMIT) {
+            if (fabs(v) < CLIPPING_LIMIT) {
                 sum_raw += v;
                 valid_samples++;
             }
@@ -169,7 +169,7 @@ double compute_dc_offset(WaveformSample* samples, int n, int phase_choice) {
     else if (phase_choice == 2) {
         for (int i = 0; i < n; i++) {
             double v = (samples + i)->phase_B_voltage;
-            if (v < CLIPPING_LIMIT) {
+            if (fabs(v) < CLIPPING_LIMIT) {
                 sum_raw += v;
                 valid_samples++;
             }
@@ -179,7 +179,7 @@ double compute_dc_offset(WaveformSample* samples, int n, int phase_choice) {
     else {
         for (int i = 0; i < n; i++) {
             double v = (samples + i)->phase_C_voltage;
-            if (v < CLIPPING_LIMIT) {
+            if (fabs(v) < CLIPPING_LIMIT) {
                 sum_raw += v;
                 valid_samples++;
             }

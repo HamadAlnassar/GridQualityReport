@@ -48,7 +48,20 @@ int main() {
         printf("Vpp Phase A: %10.2f V\n", vppA);
         printf("Vpp Phase B: %10.2f V\n", vppB);
         printf("Vpp Phase C: %10.2f V\n", vppC);
-        printf("==========================================\n");
+        printf("------------------------------------------\n");
+
+
+        // Calculate DC offset for give dataset
+        double dc_offset_a = compute_dc_offset(my_data, row_count, 1);
+        double dc_offset_b = compute_dc_offset(my_data, row_count, 1);
+        double dc_offset_c = compute_dc_offset(my_data, row_count, 1);
+
+        // Display DC Offset for every phase
+        printf("DC Offset Phase A: %10.2f V\n", dc_offset_a);
+        printf("DC Offset Phase B: %10.2f V\n", dc_offset_b);
+        printf("DC Offset Phase C: %10.2f V\n", dc_offset_c);
+        printf("------------------------------------------\n");
+
 
         // Free dynamically allocated memory to prevent memory leaks
         free(my_data);
