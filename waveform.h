@@ -29,5 +29,6 @@ typedef struct {
 
 double compute_rms(WaveformSample* samples, int n, int phase_choice , FaultyReading* fault_log , int* fault_count);
 double compute_peak_to_peak(WaveformSample* samples, int n, int phase_choice);
+double compute_dc_offset(WaveformSample* samples, int n, int phase_choice);
 
 #endif

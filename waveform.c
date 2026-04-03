@@ -142,3 +142,51 @@ double compute_peak_to_peak(WaveformSample* samples, int n, int phase_choice) {
     // Result is the total span from the lowest trough to the highest peak
     return (max_v - min_v);
 }
+
+/**
+ * @def  Calculates the DC Offset (Average Voltage) for a selected phase.
+ * @param samples Pointer to the waveform data array
+ * @param n Total number of samples in the dataset
+ * @param phase_choice Integer (1=A, 2=B, 3=C)
+ * @return The average DC voltage level (DC Offset)
+ */
+double compute_dc_offset(WaveformSample* samples, int n, int phase_choice) {
+    double sum_raw = 0.0;
+    int valid_samples = 0;
+
+    // Process Phase A
+    if (phase_choice == 1) {
+        for (int i = 0; i < n; i++) {
+            double v = (samples + i)->phase_A_voltage;
+            // Filter out positive clipping to match assignment requirements
+            if (v < CLIPPING_LIMIT) {
+                sum_raw += v;
+                valid_samples++;
+            }
+        }
+    }
+    // Process Phase B
+    else if (phase_choice == 2) {
+        for (int i = 0; i < n; i++) {
+            double v = (samples + i)->phase_B_voltage;
+            if (v < CLIPPING_LIMIT) {
+                sum_raw += v;
+                valid_samples++;
+            }
+        }
+    }
+    // Process Phase C
+    else {
+        for (int i = 0; i < n; i++) {
+            double v = (samples + i)->phase_C_voltage;
+            if (v < CLIPPING_LIMIT) {
+                sum_raw += v;
+                valid_samples++;
+            }
+        }
+    }
+
+    // Return the arithmetic mean (Sum / Count)
+    if (valid_samples == 0) return 0.0;
+    return (sum_raw / valid_samples);
+}
