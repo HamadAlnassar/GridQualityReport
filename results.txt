@@ -1,0 +1,45 @@
+--- POWER QUALITY REPORT ---
+Number of data rows processed: 1000
+
+--- RMS VOLTAGE & COMPLIANCE ---
+Phase A:     227.45 V | PASS
+Phase B:     229.81 V | PASS
+Phase C:     229.81 V | PASS
+
+--- PEAK-TO-PEAK VOLTAGES ---
+Phase A:     648.72 V
+Phase B:     649.86 V
+Phase C:     649.86 V
+
+--- DC OFFSETS ---
+Phase A:      -0.00 V
+Phase B:       0.00 V
+Phase C:      -0.00 V
+
+--- CLIPPING FAULT LOG ---
+Total Clipped Samples Identified (>324.99V): 20
+
+Timestamp    | Voltage      | Phase
+-------------------------------------
+0.0050       | 325.00       | A    
+0.0150       | -325.00      | A    
+0.0250       | 325.00       | A    
+0.0350       | -325.00      | A    
+0.0450       | 325.00       | A    
+0.0550       | -325.00      | A    
+0.0650       | 325.00       | A    
+0.0750       | -325.00      | A    
+0.0850       | 325.00       | A    
+0.0950       | -325.00      | A    
+0.1050       | 325.00       | A    
+0.1150       | -325.00      | A    
+0.1250       | 325.00       | A    
+0.1350       | -325.00      | A    
+0.1450       | 325.00       | A    
+0.1550       | -325.00      | A    
+0.1650       | 325.00       | A    
+0.1750       | -325.00      | A    
+0.1850       | 325.00       | A    
+0.1950       | -325.00      | A    
+
+--- END OF REPORT ---
