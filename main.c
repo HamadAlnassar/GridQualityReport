@@ -10,7 +10,7 @@ int main() {
     int row_count = 0;
     int total_faults = 0;
 
-    // Prompt user for the source CSV path (e.g., "waveform_data.csv")
+    // Prompt user for the source CSV path
     printf("Enter sensor log file for analysis: ");
     scanf("%s", filename);
 
@@ -20,81 +20,75 @@ int main() {
     // Proceed only if the file was opened and parsed successfully
     if (my_data != NULL) {
 
-        // Allocate memory for the fault log (Buffer for up to 100 clipped samples)
+        // Allocate memory for the fault log
         FaultyReading* faults = malloc(sizeof(FaultyReading) * 100);
+
+        // Allocate a large buffer for the final report string
+        char report_content[8192];
+        int offset = 0;
 
         // Calculate Root Mean Square (RMS) for each phase
         double rmsA = compute_rms(my_data, row_count, 1, faults, &total_faults);
         double rmsB = compute_rms(my_data, row_count, 2, faults, &total_faults);
         double rmsC = compute_rms(my_data, row_count, 3, faults, &total_faults);
 
-        // --- DATA SUMMARY REPORT
-        printf("Successfully processed %d data points.\n", row_count);
-        printf("Total Clipped Samples Identified: %d\n", total_faults);
-        printf("------------------------------------------\n");
-
-        // Display RMS results for each phase
-        printf("RMS Phase A: %10.2f V\n", rmsA);
-        printf("RMS Phase B: %10.2f V\n", rmsB);
-        printf("RMS Phase C: %10.2f V\n", rmsC);
-        printf("------------------------------------------\n");
+        // Calculate compliance status
+        int statusA = check_tolerance(rmsA);
+        int statusB = check_tolerance(rmsB);
+        int statusC = check_tolerance(rmsC);
 
         // Calculate Peak-to-Peak (Vpp) values for the dataset
         double vppA = compute_peak_to_peak(my_data, row_count, 1);
         double vppB = compute_peak_to_peak(my_data, row_count, 2);
         double vppC = compute_peak_to_peak(my_data, row_count, 3);
 
-        // Display Peak-to-Peak voltage swings
-        printf("Vpp Phase A: %10.2f V\n", vppA);
-        printf("Vpp Phase B: %10.2f V\n", vppB);
-        printf("Vpp Phase C: %10.2f V\n", vppC);
-        printf("------------------------------------------\n");
+        // 4. DC Offset (Fixed the phase_choice error)
+        double dcA = compute_dc_offset(my_data, row_count, 1);
+        double dcB = compute_dc_offset(my_data, row_count, 2);
+        double dcC = compute_dc_offset(my_data, row_count, 3);
+
+        // 1. Number of data points in file
+        offset += sprintf(report_content + offset, "--- POWER QUALITY REPORT ---\n");
+        offset += sprintf(report_content + offset, "Number of data rows processed: %d\n\n", row_count);
+
+        // 2. RMS and Tolerance Status
+        offset += sprintf(report_content + offset, "--- RMS VOLTAGE & COMPLIANCE ---\n");
+        offset += sprintf(report_content + offset, "Phase A: %10.2f V | %s\n", rmsA, (statusA == 1 ? "PASS" : "FAIL"));
+        offset += sprintf(report_content + offset, "Phase B: %10.2f V | %s\n", rmsB, (statusB == 1 ? "PASS" : "FAIL"));
+        offset += sprintf(report_content + offset, "Phase C: %10.2f V | %s\n\n", rmsC, (statusC == 1 ? "PASS" : "FAIL"));
+
+        // 3. Peak to Peak
+        offset += sprintf(report_content + offset, "--- PEAK-TO-PEAK VOLTAGES ---\n");
+        offset += sprintf(report_content + offset, "Phase A: %10.2f V\n", vppA);
+        offset += sprintf(report_content + offset, "Phase B: %10.2f V\n", vppB);
+        offset += sprintf(report_content + offset, "Phase C: %10.2f V\n\n", vppC);
 
 
-        // Calculate DC offset for give dataset
-        double dc_offset_a = compute_dc_offset(my_data, row_count, 1);
-        double dc_offset_b = compute_dc_offset(my_data, row_count, 1);
-        double dc_offset_c = compute_dc_offset(my_data, row_count, 1);
+        offset += sprintf(report_content + offset, "--- DC OFFSETS ---\n");
+        offset += sprintf(report_content + offset, "Phase A: %10.2f V\n", dcA);
+        offset += sprintf(report_content + offset, "Phase B: %10.2f V\n", dcB);
+        offset += sprintf(report_content + offset, "Phase C: %10.2f V\n\n", dcC);
 
-        // Display DC Offset for every phase
-        printf("DC Offset Phase A: %10.2f V\n", dc_offset_a);
-        printf("DC Offset Phase B: %10.2f V\n", dc_offset_b);
-        printf("DC Offset Phase C: %10.2f V\n", dc_offset_c);
-        printf("------------------------------------------\n");
+        // 5. Fault Summary and Locations
+        offset += sprintf(report_content + offset, "--- CLIPPING FAULT LOG ---\n");
+        offset += sprintf(report_content + offset, "Total Clipped Samples Identified (>324.99V): %d\n\n", total_faults);
+        offset += sprintf(report_content + offset, "%-12s | %-12s | %-5s\n", "Timestamp", "Voltage", "Phase");
+        offset += sprintf(report_content + offset, "-------------------------------------\n");
 
-
-        // Calculate compliance status
-        int statusA = check_tolerance(rmsA);
-        int statusB = check_tolerance(rmsB);
-        int statusC = check_tolerance(rmsC);
-
-
-        printf("\n--- TOLERANCE COMPLIANCE ---\n");
-
-        // Check Phase A
-        if (statusA == 1) {
-            printf("Phase A: PASS [Within Limits]\n");
-        } else {
-            printf("Phase A: FAIL [Out of Tolerance]\n");
+        for (int i = 0; i < total_faults; i++) {
+            offset += sprintf(report_content + offset, "%-12.4f | %-12.2f | %-5c\n",
+                      (faults + i)->timestamp,
+                      (faults + i)->faulty_voltage,
+                      (faults + i)->phase);
         }
 
-        // Check Phase B
-        if (statusB == 1) {
-            printf("Phase B: PASS [Within Limits]\n");
-        } else {
-            printf("Phase B: FAIL [Out of Tolerance]\n");
-        }
+        offset += sprintf(report_content + offset, "\n--- END OF REPORT ---\n");
 
-        // Check Phase C
-        if (statusC == 1) {
-            printf("Phase C: PASS [Within Limits]\n");
-        } else {
-            printf("Phase C: FAIL [Out of Tolerance]\n");
-        }
-
+        
         // Free dynamically allocated memory to prevent memory leaks
         free(my_data);
         free(faults);
+
     } else {
         printf("Error: Could not process file data.\n");
     }
