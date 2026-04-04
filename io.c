@@ -61,7 +61,7 @@ WaveformSample* read_sample_data(const char* filename, int* n) {
                                &data[i].power_factor,
                                &data[i].thd_percent);
 
-            // Integrity Check: Verify that all 8 columns were successfully parsed
+            // Verify that all 8 columns were successfully parsed
             if (items < 8) {
                 printf("Parsing Error: Inconsistent data format detected at row %d.\n", i + 1);
                 free(data); // Clean up memory before exiting
@@ -71,8 +71,33 @@ WaveformSample* read_sample_data(const char* filename, int* n) {
         }
     }
 
-    // Finalize: Assign the total count to the pointer and release the file handle
+    // Assign the total count to the pointer and release the file handle
     *n = count;
     fclose(file);
     return data;
+}
+
+
+/**
+ * Writes the final formatted report string to a physical text file.
+ * * @param filename The name of the file to be created (e.g., "results.txt")
+ * @param report_content The large buffer containing all processed data
+ */
+void write_report(const char* filename, const char* report_content) {
+    // Open the file in "write" mode
+    FILE* file = fopen(filename, "w");
+
+    // Check if the file system allowed the creation of the file
+    if (file == NULL) {
+        printf("Critical Error: Could not create the report file '%s'.\n", filename);
+        return;
+    }
+
+    // Write the entire string buffer to the file at once
+    fprintf(file, "%s", report_content);
+
+    // Close the file handle to ensure data is flushed to the disk
+    fclose(file);
+
+    printf("\nSuccess: Report has been saved to '%s'.\n", filename);
 }

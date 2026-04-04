@@ -84,7 +84,9 @@ int main() {
 
         offset += sprintf(report_content + offset, "\n--- END OF REPORT ---\n");
 
-        
+        // Save the built string to results.txt
+        write_report("results.txt", report_content);
+
         // Free dynamically allocated memory to prevent memory leaks
         free(my_data);
         free(faults);
