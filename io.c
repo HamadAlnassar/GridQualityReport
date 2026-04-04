@@ -4,7 +4,7 @@
 #include "io.h"
 
 /**
- * @def Opens a CSV sensor log, parses the waveform data, and loads it into a dynamic array.
+ * Opens a CSV sensor log, parses the waveform data, and loads it into a dynamic array.
  * @param filename The path to the source CSV file.
  * @param n Pointer to an integer where the total valid row count will be stored.
  * @return A pointer to the dynamically allocated array of WaveformSample structs.

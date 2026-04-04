@@ -63,6 +63,35 @@ int main() {
         printf("------------------------------------------\n");
 
 
+        // Calculate compliance status
+        int statusA = check_tolerance(rmsA);
+        int statusB = check_tolerance(rmsB);
+        int statusC = check_tolerance(rmsC);
+
+
+        printf("\n--- TOLERANCE COMPLIANCE ---\n");
+
+        // Check Phase A
+        if (statusA == 1) {
+            printf("Phase A: PASS [Within Limits]\n");
+        } else {
+            printf("Phase A: FAIL [Out of Tolerance]\n");
+        }
+
+        // Check Phase B
+        if (statusB == 1) {
+            printf("Phase B: PASS [Within Limits]\n");
+        } else {
+            printf("Phase B: FAIL [Out of Tolerance]\n");
+        }
+
+        // Check Phase C
+        if (statusC == 1) {
+            printf("Phase C: PASS [Within Limits]\n");
+        } else {
+            printf("Phase C: FAIL [Out of Tolerance]\n");
+        }
+
         // Free dynamically allocated memory to prevent memory leaks
         free(my_data);
         free(faults);

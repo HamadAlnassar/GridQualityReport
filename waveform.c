@@ -6,7 +6,7 @@
  * Calculates the Root Mean Square (RMS) voltage for a specific phase.
  * Identifies and logs sensor clipping faults (values >= 324.99V) to a separate struct.
  * Faulty samples are excluded from the RMS calculation to ensure data integrity.
- * * @param samples Pointer to the array of waveform data
+ * @param samples Pointer to the array of waveform data
  * @param n Total number of data rows in the dataset
  * @param phase_choice Integer representing Phase A (1), B (2), or C (3)
  * @param fault_log Pointer to the struct array where clipped samples are stored
@@ -91,7 +91,7 @@ double compute_rms(WaveformSample* samples, int n, int phase_choice, FaultyReadi
 /**
  * Determines the Peak-to-Peak voltage (Vpp) by finding the difference
  * between the maximum and minimum valid voltages recorded.
- * * @param samples Pointer to the array of waveform data
+ * @param samples Pointer to the array of waveform data
  * @param n Total number of data rows
  * @param phase_choice Integer representing the selected phase
  * @return The total voltage swing (Max - Min) excluding clipped data
@@ -144,7 +144,7 @@ double compute_peak_to_peak(WaveformSample* samples, int n, int phase_choice) {
 }
 
 /**
- * @def  Calculates the DC Offset (Average Voltage) for a selected phase.
+ * Calculates the DC Offset (Average Voltage) for a selected phase.
  * @param samples Pointer to the waveform data array
  * @param n Total number of samples in the dataset
  * @param phase_choice Integer (1=A, 2=B, 3=C)
@@ -189,4 +189,27 @@ double compute_dc_offset(WaveformSample* samples, int n, int phase_choice) {
     // Return the arithmetic mean (Sum / Count)
     if (valid_samples == 0) return 0.0;
     return (sum_raw / valid_samples);
+}
+
+/**
+ * Checks if the calculated RMS voltage complies with standard tolerances (+10% / -6%).
+ * For a 230V system: Max = 253.0V, Min = 216.2V.
+ * *@param rms_value The calculated RMS voltage of a phase
+ * @return 1 if Compliant (Pass), 0 if Non-Compliant (Fail)
+ */
+int check_tolerance(double rms_value) {
+
+    // lower and higer limit of ±10% of 230 V
+    double upper_limit = 253.0;
+    double lower_limit = 207.0;
+
+    // if rms within range than return 1 as true
+    if (rms_value >= lower_limit && rms_value <= upper_limit) {
+        return 1;
+    }
+
+    // if rms not within range than return 0 as false
+    else {
+        return 0;
+    }
 }
